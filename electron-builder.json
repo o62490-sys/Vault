@@ -1,0 +1,59 @@
+{
+  "appId": "com.react.vault.manager",
+  "productName": "React Vault Manager",
+  "directories": {
+    "output": "dist-electron/release",
+    "buildResources": "src"
+  },
+  "icon": "password_manager_icons/128x128@2x.png",
+  "files": [
+    "build/electron/**/*",
+    "dist-electron/main.cjs",
+    "dist-electron/preload.cjs"
+  ],
+  "extraResources": [
+    {
+      "from": "assets",
+      "to": "assets",
+      "filter": ["**/*"]
+    }
+  ],
+  "mac": {
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "category": "public.app-category.productivity",
+    "icon": "password_manager_icons/icon_transparent.icns"
+  },
+  "linux": {
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64"]
+      }
+    ],
+    "category": "Office",
+    "synopsis": "A secure password vault manager",
+    "icon": "password_manager_icons/128x128@x2.png"
+  },
+  "win": {
+    "target": [
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      }
+    ],
+    "publisherName": "React Vault Manager",
+    "icon": "password_manager_icons/128x128@2x.png"
+  },
+  "portable": {
+    "artifactName": "React-Vault-Manager-Portable.exe"
+  }
+}

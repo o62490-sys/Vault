@@ -1,0 +1,12 @@
+{
+  "identifier": "main",
+  "windows": ["main"],
+  "permissions": [
+    "fs:allow-read-file",
+    "fs:allow-write-file",
+    "fs:allow-remove",
+    "fs:allow-mkdir",
+    "fs:allow-exists",
+    "shell:allow-open"
+  ]
+}

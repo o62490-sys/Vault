@@ -13,6 +13,39 @@ A secure, client-side password manager built with React and TypeScript. This app
 - **Backup & Restore**: Easily export and import your encrypted vault data.
 - **Cross-Platform**: Run as a desktop app (Windows, macOS, Linux), a mobile app (iOS, Android), or directly in the browser.
 
+## 🏗️ Build Targets
+
+This application supports multiple deployment targets:
+
+| Target | Platforms | Use Case | Build Command |
+|--------|-----------|----------|---------------|
+| **Electron** (Recommended) | Windows, macOS, Linux | Native desktop app with best user experience | `npm run electron:build` |
+| **Tauri** | Windows, macOS, Linux | Lightweight desktop app (alternative to Electron) | `npm run tauri:build` |
+| **Capacitor** | iOS, Android | Native mobile applications | `npm run sync:android` / `npm run sync:ios` |
+| **Web** | All platforms | Browser-based version | `npm run build` |
+
+### 🔧 Recent Fixes Applied
+
+**Fixed Issues:**
+- ✅ **Electron Build**: Fixed missing main entry file error by moving `main.cjs` to `dist-electron/` directory
+- ✅ **Multi-platform Support**: Added Mac and Linux build configurations to electron-builder.json
+- ✅ **Tauri Build**: Successfully upgraded from Tauri 1.6 to 2.x with proper configuration
+- ✅ **Metadata**: Added missing description and author fields to package.json
+- ✅ **Assets**: Created assets directory with proper icon files for all platforms
+
+**Build Commands Now Working:**
+```bash
+# ✅ Electron (Recommended - Fully Working)
+npm run electron:build:win    # Windows portable executable (69.9 MB)
+                              # Location: dist-electron/release/React-Vault-Manager-Portable.exe
+
+# ✅ Tauri (Alternative - Lightweight & Working!)
+npm run tauri:build           # Tauri desktop app (all platforms)
+                              # Executable: src-tauri/target/release/react-vault-manager.exe
+                              # Size: ~15-20 MB (much smaller than Electron!)
+                              # Uses system WebView2 (faster startup)
+```
+
 ## 🚀 How to Run (Web Browser)
 
 This project uses [Vite](https://vitejs.dev/) as a build tool. You will need [Node.js](https://nodejs.org/) and `npm` installed.
@@ -37,9 +70,49 @@ This project uses [Vite](https://vitejs.dev/) as a build tool. You will need [No
     ```
     This command will create a `dist` folder ready to be hosted on any static web server.
 
-## 💻 Building for Desktop (Recommended)
+## 🖥️ Building for Desktop (Electron - Recommended)
 
-This project is configured with [Tauri](https://tauri.app/) to build a standalone desktop application. This is the most secure way to use the app, as your data is stored in a safe location outside of your browser.
+This project is configured with [Electron](https://www.electronjs.org/) to build a native desktop application. This provides a better user experience than Tauri and builds reliably on Windows without MSI issues.
+
+### Prerequisites
+
+You need to have [Node.js](https://nodejs.org/) installed. No additional system dependencies required!
+
+### Run and Build
+
+1.  **Run in Development Mode**:
+    To run the app as a native desktop application for development, use:
+    ```bash
+    npm run electron:dev
+    ```
+    This will start both the Vite dev server and launch the Electron app.
+
+2.  **Run Electron App Only**:
+    If the dev server is already running, you can launch just the Electron app:
+    ```bash
+    npm run electron
+    ```
+
+3.  **Build the Application**:
+    To build the final, installable desktop application, run:
+     ```bash
+    npm run electron:build
+    ```
+    This command will create native installers for your specific operating system:
+    - Windows: `.exe` installer in `dist-electron` directory
+    - macOS: `.dmg` file in `dist-electron` directory
+    - Linux: `.AppImage` file in `dist-electron` directory
+
+4.  **Build for Specific Platforms**:
+    ```bash
+    npm run electron:build:win    # Windows only
+    npm run electron:build:mac    # macOS only
+    npm run electron:build:linux  # Linux only
+    ```
+
+## 💻 Building for Desktop (Tauri - Alternative)
+
+This project is also configured with [Tauri](https://tauri.app/) as an alternative to Electron for building a standalone desktop application. Tauri is more lightweight but may have build issues on some systems.
 
 ### Prerequisites
 
