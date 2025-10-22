@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">React Vault</string>
+    <string name="title_activity_main">React Vault</string>
+    <string name="package_name">com.react.vault.manager</string>
+    <string name="custom_url_scheme">com.react.vault.manager</string>
+</resources>
