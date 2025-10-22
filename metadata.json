@@ -1,0 +1,5 @@
+{
+  "name": "React Vault Manager",
+  "description": "A secure, client-side password manager built with React and TypeScript. It allows users to create encrypted vaults, manage login entries, generate strong passwords, and handle backups, with all data stored locally in the browser.",
+  "requestFramePermissions": []
+}
