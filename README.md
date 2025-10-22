@@ -70,6 +70,25 @@ This project uses [Vite](https://vitejs.dev/) as a build tool. You will need [No
     ```
     This command will create a `dist` folder ready to be hosted on any static web server.
 
+## 🛠️ Available Build Commands
+
+| Command | Description | Output Location |
+|---------|-------------|-----------------|
+| `npm run dev` | Start development server | Browser at http://localhost:5173 |
+| `npm run build` | Build web version | `dist/` folder |
+| `npm run preview` | Preview web build | Local server |
+| `npm run electron` | Run Electron app | Desktop window |
+| `npm run electron:dev` | Run Electron in dev mode | Desktop with hot reload |
+| `npm run electron:build` | Build Electron for current platform | `dist-electron/release/` |
+| `npm run electron:build:win` | Build Windows Electron app | `dist-electron/release/*.exe` |
+| `npm run electron:build:mac` | Build macOS Electron app | `dist-electron/release/*.dmg` |
+| `npm run electron:build:linux` | Build Linux Electron app | `dist-electron/release/*.AppImage` |
+| `npm run tauri:build` | Build Tauri desktop app | `src-tauri/target/release/bundle/` |
+| `npm run sync:android` | Prepare Android build | `android/` folder |
+| `npm run sync:ios` | Prepare iOS build | iOS project files |
+| `npm run open:android` | Open in Android Studio | Android development |
+| `npm run open:ios` | Open in Xcode | iOS development |
+
 ## 🖥️ Building for Desktop (Electron - Recommended)
 
 This project is configured with [Electron](https://www.electronjs.org/) to build a native desktop application. This provides a better user experience than Tauri and builds reliably on Windows without MSI issues.
@@ -190,6 +209,11 @@ This project is configured with [Capacitor](https://capacitorjs.com/) to allow y
 ## 🔐 Security
 
 The security of your data is the top priority.
+- The master password is never stored. It is used only in memory to derive the encryption key.
+- The derived key is used to encrypt a separate, randomly generated "vault key".
+- This vault key is what encrypts all your individual entries.
+- All sensitive information, including the TOTP secret, is encrypted before being stored.
+
 - The master password is never stored. It is used only in memory to derive the encryption key.
 - The derived key is used to encrypt a separate, randomly generated "vault key".
 - This vault key is what encrypts all your individual entries.
