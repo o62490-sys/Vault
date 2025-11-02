@@ -8,20 +8,14 @@
   "identifier": "com.react.vault.manager",
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": "nsis",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
-      "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "category": "DeveloperTool",
-    "shortDescription": "A secure password vault manager",
-    "longDescription": "A secure, client-side password manager built with React and TypeScript",
-    "copyright": "Copyright © 2025 React Vault Manager Team. All rights reserved.",
-    "publisher": "React Vault Manager Team",
-    "homepage": "https://github.com/yourusername/react-vault-manager"
+    "category": "DeveloperTool"
   },
   "plugins": {
     "updater": {

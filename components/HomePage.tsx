@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { dbService } from '../services/dbService';
+import { getDbService } from '../services/dbService';
 import type { EncryptedVault } from '../types';
 
 interface HomePageProps {
@@ -11,10 +11,14 @@ export function HomePage({ onCreateNew, onSelectVault }: HomePageProps) {
   const [vaults, setVaults] = useState<string[]>([]);
   
   useEffect(() => {
-    setVaults(dbService.getVaultNames());
+    const fetchVaults = async () => {
+      const dbService = await getDbService();
+      setVaults(await dbService.getVaultNames());
+    };
+    fetchVaults();
   }, []);
 
-  const handleRestoreBackup = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRestoreBackup = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -50,14 +54,15 @@ export function HomePage({ onCreateNew, onSelectVault }: HomePageProps) {
             encryptedVaultKeyForRecovery: backupData.encrypted_vault_key_for_recovery,
         };
 
-        if (dbService.getVault(vaultName)) {
+        const dbService = await getDbService();
+        if (await dbService.getVault(vaultName)) {
             if (!window.confirm(`Vault "${vaultName}" already exists. Overwrite it?`)) {
                 return;
             }
         }
-        
-        dbService.saveVault(vaultName, restoredVault);
-        setVaults(dbService.getVaultNames());
+
+        await dbService.saveVault(vaultName, restoredVault);
+        setVaults(await dbService.getVaultNames());
         alert(`Vault "${vaultName}" restored successfully!`);
       } catch (error) {
         console.error("Restore failed:", error);

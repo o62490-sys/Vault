@@ -6,6 +6,16 @@ export interface Entry {
   password?: string; // Decrypted password
 }
 
+export interface TwoFactorEntry {
+  id: string;
+  title: string;
+  issuer: string;
+  secret: string; // Encrypted TOTP secret
+  algorithm?: 'SHA1' | 'SHA256' | 'SHA512';
+  digits?: 6 | 8;
+  period?: number;
+}
+
 // Stored in localStorage, passwords are encrypted
 export interface EncryptedVault {
   name: string;
@@ -17,11 +27,12 @@ export interface EncryptedVault {
   totpIv?: string; // IV for TOTP secret encryption
   recoverySalt?: string;
   entries: string; // JSON string of Entry[] with passwords encrypted by vaultKey, then base64
+  twoFactorEntries?: string; // JSON string of TwoFactorEntry[] with secrets encrypted by vaultKey, then base64
 
   // New fields for password recovery
   recoveryMethod?: 'code' | 'questions';
   // Hashed recovery code OR JSON string of {q: string, a: string (hashed)}[]
-  recoveryData?: string; 
+  recoveryData?: string;
   recoveryIv?: string; // IV for encrypting vault key with recovery key
   encryptedVaultKeyForRecovery?: string; // vaultKey encrypted with recoveryKey
 }
@@ -32,6 +43,7 @@ export interface UnlockedVault {
   vaultKey: CryptoKey;
   masterKey: CryptoKey;
   entries: Entry[];
+  twoFactorEntries: TwoFactorEntry[];
   encryptedVault: Omit<EncryptedVault, 'entries'>;
 }
 

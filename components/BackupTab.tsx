@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { UnlockedVault, BackupData } from '../types';
 import { cryptoService } from '../services/cryptoService';
+import { getDbService } from '../services/dbService';
 
 interface BackupTabProps {
   vault: UnlockedVault;
 }
 
 export function BackupTab({ vault }: BackupTabProps) {
+  const [dbLocationHint, setDbLocationHint] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getDbPathHint = async () => {
+      if (typeof window !== 'undefined') {
+        if ((window as any).electronAPI) {
+          // Electron environment
+          const userDataPath = await (window as any).electronAPI.getAppPath('userData');
+          const dbPath = await (window as any).electronAPI.pathJoin(userDataPath, 'vaults.db');
+          setDbLocationHint(`Your vault data is stored in a SQLite database at: ${dbPath}`);
+        } else if ((window as any).__TAURI__) {
+          // Tauri environment
+          // Tauri's plugin-sql stores in app data directory by default
+          setDbLocationHint(`Your vault data is stored in a SQLite database within your application data directory.`);
+        }
+      }
+    };
+    getDbPathHint();
+  }, []);
 
   const handleExport = async () => {
     try {
@@ -54,6 +74,12 @@ export function BackupTab({ vault }: BackupTabProps) {
         Export your vault to a secure backup file. Store this file in a safe place. You can restore your vault from this file on any device.
       </p>
       
+      {dbLocationHint && (
+        <div className="max-w-md mx-auto mb-8 text-sm text-info bg-blue-100 border border-blue-400 rounded p-3" role="alert">
+          <strong>Note for Desktop Users:</strong> {dbLocationHint}
+        </div>
+      )}
+
       <div className="max-w-md mx-auto mb-8 text-sm text-accent bg-input-bg p-3 rounded-md">
         <strong>Security Note:</strong> The backup file contains your encrypted data. It is useless without your original Master Password.
       </div>

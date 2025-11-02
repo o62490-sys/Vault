@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { EncryptedVault } from '../types';
 import { cryptoService } from '../services/cryptoService';
-import { dbService } from '../services/dbService';
+import { getDbService } from '../../services/dbService';
 
 interface PasswordResetModalProps {
   vaultData: EncryptedVault;
@@ -105,6 +105,7 @@ export function PasswordResetModal({ vaultData, onClose }: PasswordResetModalPro
               iv: iv,
           };
 
+          const dbService = await getDbService();
           await dbService.saveVault(updatedVault.name, updatedVault);
           setStep('success');
 

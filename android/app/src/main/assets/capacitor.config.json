@@ -1,6 +1,5 @@
 {
 	"appId": "com.react.vault.manager",
 	"appName": "React Vault Manager",
-	"webDir": "build/mobile",
-	"bundledWebRuntime": false
+	"webDir": "build/mobile"
 }

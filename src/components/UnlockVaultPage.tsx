@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { dbService } from '../services/dbService';
-import { cryptoService } from '../services/cryptoService';
-import type { UnlockedVault, EncryptedVault } from '../types';
+import { getDbService } from '../../services/dbService';
+import { cryptoService } from '../../services/cryptoService';
+import type { UnlockedVault, EncryptedVault, TwoFactorEntry } from '../types';
 import * as OTPAuth from 'otpauth';
 import { PasswordResetModal } from './PasswordResetModal';
 
@@ -9,9 +9,10 @@ interface UnlockVaultPageProps {
   vaultName: string;
   onUnlock: (vault: UnlockedVault) => void;
   onBack: () => void;
+  onVaultDeleted?: () => void;
 }
 
-export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPageProps) {
+export function UnlockVaultPage({ vaultName, onUnlock, onBack, onVaultDeleted }: UnlockVaultPageProps) {
   const [password, setPassword] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +25,7 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
   useEffect(() => {
     const loadVault = async () => {
       setIsLoadingVault(true);
+      const dbService = await getDbService();
       const data = await dbService.getVault(vaultName);
       setVaultData(data);
       setIsLoadingVault(false);
@@ -47,7 +49,7 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
         if (!totpCode.trim()) {
           throw new Error("TOTP code is required.");
         }
-        
+
         // Decrypt the TOTP secret
         const encryptedSecretAb = cryptoService.b64decode(vaultData.encryptedTotpSecret);
         const totpIvAb = cryptoService.b64decode(vaultData.totpIv);
@@ -68,12 +70,16 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
       );
 
       const entries = await cryptoService.decryptEntries(vaultData.entries, vaultKey);
-      
+      const twoFactorEntries = vaultData.twoFactorEntries
+        ? await cryptoService.decryptTwoFactorEntries(vaultData.twoFactorEntries, vaultKey)
+        : [];
+
       const unlockedVault: UnlockedVault = {
           name: vaultData.name,
           vaultKey,
           masterKey,
           entries,
+          twoFactorEntries,
           encryptedVault: {
             name: vaultData.name,
             encryptedVaultKey: vaultData.encryptedVaultKey,
@@ -83,6 +89,7 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
             encryptedTotpSecret: vaultData.encryptedTotpSecret,
             totpIv: vaultData.totpIv,
             recoverySalt: vaultData.recoverySalt,
+            twoFactorEntries: vaultData.twoFactorEntries,
             recoveryMethod: vaultData.recoveryMethod,
             recoveryData: vaultData.recoveryData,
             recoveryIv: vaultData.recoveryIv,
@@ -97,6 +104,23 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
       setError(e.message || 'Invalid password or an error occurred.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteVault = async () => {
+    const firstConfirm = window.confirm(`Are you sure you want to delete the vault '${vaultName}'? This action cannot be undone.`);
+    if (firstConfirm) {
+      const secondConfirm = window.confirm(`This will permanently delete all passwords and data in the vault '${vaultName}'. Are you absolutely sure?`);
+      if (secondConfirm) {
+        try {
+          const dbService = await getDbService();
+          await dbService.deleteVault(vaultName);
+          onVaultDeleted?.(); // Call the callback if provided
+        } catch (e: any) {
+          console.error("Failed to delete vault:", e);
+          setError(e.message || 'Failed to delete vault.');
+        }
+      }
     }
   };
 
@@ -168,6 +192,11 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
             <button type="button" onClick={onBack} className="btn btn-secondary">
               Back
             </button>
+            {onVaultDeleted && (
+              <button type="button" onClick={handleDeleteVault} className="btn btn-danger w-full">
+                Delete Vault
+              </button>
+            )}
           </div>
         </form>
       </div>

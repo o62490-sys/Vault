@@ -1,6 +1,55 @@
 const { app, BrowserWindow, Menu, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs').promises;
+const Database = require('better-sqlite3'); // Import better-sqlite3
+
+let db = null; // SQLite database instance
+
+ipcMain.handle('sqlite:open', async (event, dbPath) => {
+  try {
+    db = new Database(dbPath); // Open database synchronously
+    db.pragma('journal_mode = WAL'); // Enable WAL mode for better concurrency
+    // Initialize schema if not already done
+    db.exec('CREATE TABLE IF NOT EXISTS vaults (name TEXT PRIMARY KEY, data TEXT)');
+    db.exec('CREATE TABLE IF NOT EXISTS vault_names (name TEXT PRIMARY KEY)');
+    return { success: true };
+  } catch (error) {
+    throw new Error(`Failed to open database: ${error.message}`);
+  }
+});
+
+ipcMain.handle('sqlite:run', async (event, sql, params) => {
+  if (!db) throw new Error('Database not open');
+  try {
+    const stmt = db.prepare(sql);
+    const result = stmt.run(params);
+    return { success: true, changes: result.changes, lastID: result.lastLastID };
+  } catch (error) {
+    throw new Error(`Failed to run SQL: ${error.message}`);
+  }
+});
+
+ipcMain.handle('sqlite:get', async (event, sql, params) => {
+  if (!db) throw new Error('Database not open');
+  try {
+    const stmt = db.prepare(sql);
+    const row = stmt.get(params);
+    return { success: true, row };
+  } catch (error) {
+    throw new Error(`Failed to get row: ${error.message}`);
+  }
+});
+
+ipcMain.handle('sqlite:all', async (event, sql, params) => {
+  if (!db) throw new Error('Database not open');
+  try {
+    const stmt = db.prepare(sql);
+    const rows = stmt.all(params);
+    return { success: true, rows };
+  } catch (error) {
+    throw new Error(`Failed to get all rows: ${error.message}`);
+  }
+});
 
 let mainWindow;
 
@@ -18,9 +67,9 @@ function createWindow() {
       contextIsolation: true,
       enableRemoteModule: false,
       preload: path.join(__dirname, 'preload.cjs'),
-      webSecurity: false, // Temporarily disable for debugging input issues
-      allowRunningInsecureContent: true,
-      experimentalFeatures: true // Enable for better compatibility
+      webSecurity: true, // Set to true for security
+      allowRunningInsecureContent: false,
+      experimentalFeatures: false // Set to false for security
     },
     icon: path.join(__dirname, 'assets/icon.png'), // fallback icon
     title: 'React Vault Manager',
@@ -41,8 +90,7 @@ function createWindow() {
   // Load the app
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
-    // Only open dev tools if specifically requested (uncomment next line if needed)
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools(); // Open dev tools automatically in dev mode
   } else {
     mainWindow.loadFile(path.join(__dirname, '../build/electron/index.html'));
   }

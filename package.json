@@ -17,7 +17,7 @@
     "preview": "vite preview",
     "electron": "electron .",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron:build": "npm run build:electron && npx electron-builder --publish=never",
+    "electron:build": "npm run build:electron && electron-builder install-app-deps && npx electron-builder --publish=never",
     "electron:build:win": "npm run build:electron && npx electron-builder --win",
     "electron:build:mac": "npm run build:electron && npx electron-builder --mac",
     "electron:build:linux": "npm run build:electron && npx electron-builder --linux",
@@ -29,6 +29,9 @@
   },
   "dependencies": {
     "@tauri-apps/plugin-fs": "^2.4.2",
+    "@tauri-apps/plugin-sql": "^2.0.0-beta.10",
+    "@zxing/library": "^0.21.3",
+    "better-sqlite3": "^9.6.0",
     "otpauth": "^9.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

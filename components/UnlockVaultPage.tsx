@@ -9,9 +9,11 @@ interface UnlockVaultPageProps {
   vaultName: string;
   onUnlock: (vault: UnlockedVault) => void;
   onBack: () => void;
+  onVaultDeleted: () => void; // New prop to notify parent of deletion
 }
 
-export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPageProps) {
+export function UnlockVaultPage({ vaultName, onUnlock, onBack, onVaultDeleted }: UnlockVaultPageProps) {
+  console.log(`UnlockVaultPage: Rendering for vault: ${vaultName}`);
   const [password, setPassword] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +21,7 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
   const [showResetModal, setShowResetModal] = useState(false);
   
   const vaultData = dbService.getVault(vaultName);
+  console.log("UnlockVaultPage: vaultData", vaultData);
   
   const handleUnlock = async () => {
     if (!vaultData) {
@@ -29,7 +32,7 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
     setIsLoading(true);
 
     try {
-      const salt = cryptoService.b64decode(vaultData.salt);
+      const salt = await cryptoService.b64decode(vaultData.salt);
       const masterKey = await cryptoService.deriveKey(password, new Uint8Array(salt));
 
       if (vaultData.authMethods.includes('totp') && vaultData.encryptedTotpSecret && vaultData.totpIv) {
@@ -38,8 +41,8 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
         }
         
         // Decrypt the TOTP secret
-        const encryptedSecretAb = cryptoService.b64decode(vaultData.encryptedTotpSecret);
-        const totpIvAb = cryptoService.b64decode(vaultData.totpIv);
+        const encryptedSecretAb = await cryptoService.b64decode(vaultData.encryptedTotpSecret);
+        const totpIvAb = await cryptoService.b64decode(vaultData.totpIv);
         const decryptedSecretAb = await cryptoService.decryptData(encryptedSecretAb, masterKey, new Uint8Array(totpIvAb));
         const totpSecret = new TextDecoder().decode(decryptedSecretAb);
 
@@ -89,7 +92,20 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
     }
   };
 
+  const handleDeleteVault = async () => {
+    if (window.confirm(`Are you sure you want to delete the vault '${vaultName}'? This action cannot be undone.`)) {
+      try {
+        await dbService.deleteVault(vaultName);
+        onVaultDeleted(); // Notify parent component
+      } catch (e: any) {
+        console.error("Failed to delete vault:", e);
+        setError(e.message || 'Failed to delete vault.');
+      }
+    }
+  };
+
   if (!vaultData) {
+    console.log("UnlockVaultPage: vaultData is null, rendering error state.");
     return (
       <div className="bg-surface rounded-lg shadow-main p-8 max-w-md mx-auto text-center animate-fade-in">
         <h1 className="text-2xl font-bold text-error mb-4">Error</h1>
@@ -104,6 +120,7 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
   // Checking for the mere existence (truthiness) of `recoveryMethod` is sufficient.
   const canAttemptRecovery = !!vaultData.recoveryMethod;
 
+  console.log("UnlockVaultPage: Rendering form with delete button.");
   return (
     <>
       <div className="bg-surface rounded-lg shadow-main p-8 max-w-md mx-auto animate-fade-in">
@@ -151,6 +168,9 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack }: UnlockVaultPage
             </button>
             <button type="button" onClick={onBack} className="btn btn-secondary">
               Back
+            </button>
+            <button type="button" onClick={handleDeleteVault} className="btn btn-danger w-full">
+              Delete Vault
             </button>
           </div>
         </form>

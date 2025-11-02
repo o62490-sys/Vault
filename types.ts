@@ -47,7 +47,6 @@ export interface BackupData {
     entries: string;
     created_at: string;
 
-    // FIX: Add missing password recovery fields to the backup data interface.
     recovery_method?: 'code' | 'questions';
     recovery_data?: string;
     recovery_iv?: string;

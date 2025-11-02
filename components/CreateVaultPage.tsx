@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { dbService } from '../services/dbService';
+import { getDbService } from '../services/dbService';
 import { cryptoService } from '../services/cryptoService';
 import type { EncryptedVault } from '../types';
 import * as OTPAuth from 'otpauth';
@@ -54,7 +54,8 @@ export function CreateVaultPage({ onBack, onCreated }: CreateVaultPageProps) {
       setError('Passwords do not match.');
       return;
     }
-    if (dbService.getVault(vaultName.trim())) {
+    const dbService = await getDbService();
+    if (await dbService.getVault(vaultName.trim())) {
       setError('A vault with this name already exists.');
       return;
     }

@@ -5,8 +5,8 @@ import { CreateVaultPage } from './components/CreateVaultPage';
 import { UnlockVaultPage } from './components/UnlockVaultPage';
 import { VaultView } from './components/VaultView';
 import type { UnlockedVault, EncryptedVault } from './types';
-import { dbService } from './services/dbService';
-import { cryptoService } from './services/cryptoService';
+import { getDbService } from '../services/dbService';
+import { cryptoService } from '../services/cryptoService';
 
 type View = 'home' | 'create' | 'unlock';
 
@@ -41,10 +41,13 @@ export default function App() {
   const handleSaveVault = async (vault: UnlockedVault) => {
     if (!vault.masterKey) return;
     const encryptedEntries = await cryptoService.encryptEntries(vault.entries, vault.vaultKey);
+    const encryptedTwoFactorEntries = await cryptoService.encryptTwoFactorEntries(vault.twoFactorEntries, vault.vaultKey);
     const encryptedVaultData: EncryptedVault = {
         ...vault.encryptedVault,
         entries: encryptedEntries,
+        twoFactorEntries: encryptedTwoFactorEntries,
     };
+    const dbService = await getDbService();
     await dbService.saveVault(vault.name, encryptedVaultData);
     setUnlockedVault(vault);
   };
@@ -58,7 +61,7 @@ export default function App() {
       case 'create':
         return <CreateVaultPage onBack={handleBackToHome} onCreated={handleBackToHome} />;
       case 'unlock':
-        return currentVaultName ? <UnlockVaultPage vaultName={currentVaultName} onUnlock={handleUnlock} onBack={handleBackToHome} /> : <HomePage onCreateNew={handleCreateNew} onSelectVault={handleSelectVault} />;
+        return currentVaultName ? <UnlockVaultPage vaultName={currentVaultName} onUnlock={handleUnlock} onBack={handleBackToHome} onVaultDeleted={handleBackToHome} /> : <HomePage onCreateNew={handleCreateNew} onSelectVault={handleSelectVault} />;
       case 'home':
       default:
         return <HomePage onCreateNew={handleCreateNew} onSelectVault={handleSelectVault} />;

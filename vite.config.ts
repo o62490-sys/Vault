@@ -10,7 +10,7 @@ export default defineConfig({
     outDir: process.env.BUILD_DIR || 'build/web',
     emptyOutDir: false,
     rollupOptions: {
-      external: ['@tauri-apps/api', '@tauri-apps/plugin-fs', '@tauri-apps/plugin-shell', '@tauri-apps/api/path'],
+      external: ['@tauri-apps/api', '@tauri-apps/plugin-fs', '@tauri-apps/plugin-shell', '@tauri-apps/api/path', '@capacitor/storage', '@tauri-apps/plugin-sql'],
       output: {
         manualChunks: undefined,
       }

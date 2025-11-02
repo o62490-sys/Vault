@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { dbService } from '../services/dbService';
+import { getDbService } from '../../services/dbService';
 import { cryptoService } from '../services/cryptoService';
 import type { EncryptedVault } from '../types';
 import * as OTPAuth from 'otpauth';
@@ -54,6 +54,7 @@ export function CreateVaultPage({ onBack, onCreated }: CreateVaultPageProps) {
       setError('Passwords do not match.');
       return;
     }
+    const dbService = await getDbService();
     if (await dbService.getVault(vaultName.trim())) {
       setError('A vault with this name already exists.');
       return;
@@ -79,24 +80,24 @@ export function CreateVaultPage({ onBack, onCreated }: CreateVaultPageProps) {
       const { iv, encryptedKey } = await cryptoService.encryptVaultKey(vaultKey, masterKey);
 
       const newVault: Partial<EncryptedVault> = {
-        name: vaultName.trim(),
-        encryptedVaultKey: encryptedKey,
-        salt: cryptoService.b64encode(salt),
-        iv: iv,
-        authMethods: ['master_password'],
-        entries: '', // Initially empty
-      };
+       name: vaultName.trim(),
+       encryptedVaultKey: encryptedKey,
+       salt: cryptoService.b64encode(salt.buffer as ArrayBuffer),
+       iv: iv,
+       authMethods: ['master_password'],
+       entries: '', // Initially empty
+     };
 
       // 2FA Setup
       if (enableTotp) {
-        newVault.authMethods.push('totp');
+        newVault.authMethods!.push('totp');
         const secret = new OTPAuth.Secret();
         const plainTotpSecret = secret.base32;
 
         // Encrypt the TOTP secret with the master key
-        const { iv: totpIv, encryptedData: encryptedTotpData } = await cryptoService.encryptData(new TextEncoder().encode(plainTotpSecret), masterKey);
+        const { iv: totpIv, encryptedData: encryptedTotpData } = await cryptoService.encryptData(new TextEncoder().encode(plainTotpSecret).buffer, masterKey);
         newVault.encryptedTotpSecret = cryptoService.b64encode(encryptedTotpData);
-        newVault.totpIv = cryptoService.b64encode(totpIv);
+        newVault.totpIv = cryptoService.b64encode(totpIv.buffer as ArrayBuffer);
         
         const totp = new OTPAuth.TOTP({
             issuer: "Vault Manager",
@@ -113,14 +114,14 @@ export function CreateVaultPage({ onBack, onCreated }: CreateVaultPageProps) {
       // Recovery Setup
       if (recoveryMethod !== 'none') {
         const recoverySalt = cryptoService.generateSalt();
-        newVault.recoverySalt = cryptoService.b64encode(recoverySalt);
+        newVault.recoverySalt = cryptoService.b64encode(recoverySalt.buffer as ArrayBuffer);
         newVault.recoveryMethod = recoveryMethod;
 
         let recoverySecret: string;
         let recoveryDataToStore: string;
 
         if (recoveryMethod === 'code') {
-          const generatedCode = (cryptoService.b64encode(cryptoService.generateSalt()) + cryptoService.b64encode(cryptoService.generateSalt())).substring(0, 32);
+          const generatedCode = (cryptoService.b64encode(cryptoService.generateSalt().buffer as ArrayBuffer) + cryptoService.b64encode(cryptoService.generateSalt().buffer as ArrayBuffer)).substring(0, 32);
           recoverySecret = generatedCode;
           setRecoveryCode(generatedCode); // For the modal
           recoveryDataToStore = await cryptoService.hashData(recoverySecret, recoverySalt);
@@ -143,7 +144,7 @@ export function CreateVaultPage({ onBack, onCreated }: CreateVaultPageProps) {
         newVault.recoveryData = recoveryDataToStore;
       }
       
-      await dbService.saveVault(newVault.name, newVault as EncryptedVault);
+      await dbService.saveVault(newVault.name!, newVault as EncryptedVault);
       
       if (enableTotp) setShowTotpModal(true);
       else if (recoveryMethod === 'code') setShowRecoveryCodeModal(true);

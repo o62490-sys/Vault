@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { dbService } from '../services/dbService';
+import { getDbService } from '../../services/dbService';
 import type { EncryptedVault } from '../types';
 
 interface HomePageProps {
@@ -12,6 +12,7 @@ export function HomePage({ onCreateNew, onSelectVault }: HomePageProps) {
   
   useEffect(() => {
     const fetchVaults = async () => {
+      const dbService = await getDbService();
       setVaults(await dbService.getVaultNames());
     };
     fetchVaults();
@@ -53,12 +54,13 @@ export function HomePage({ onCreateNew, onSelectVault }: HomePageProps) {
             encryptedVaultKeyForRecovery: backupData.encrypted_vault_key_for_recovery,
         };
 
+        const dbService = await getDbService();
         if (await dbService.getVault(vaultName)) {
             if (!window.confirm(`Vault "${vaultName}" already exists. Overwrite it?`)) {
                 return;
             }
         }
-        
+
         await dbService.saveVault(vaultName, restoredVault);
         setVaults(await dbService.getVaultNames());
         alert(`Vault "${vaultName}" restored successfully!`);

@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import type { UnlockedVault, Entry } from '../types';
+import type { UnlockedVault, Entry, TwoFactorEntry } from '../types';
 import { ViewEntriesTab } from './ViewEntriesTab';
 import { AddEditEntryTab } from './AddEditEntryTab';
 import { BackupTab } from './BackupTab';
+import { TwoFactorTab } from './TwoFactorTab';
 
 interface VaultViewProps {
   vault: UnlockedVault;
@@ -11,7 +12,7 @@ interface VaultViewProps {
   onLock: () => void;
 }
 
-type Tab = 'view' | 'add_edit' | 'backup';
+type Tab = 'view' | 'add_edit' | 'twofactor' | 'backup';
 
 export function VaultView({ vault, onSave, onLock }: VaultViewProps) {
   const [activeTab, setActiveTab] = useState<Tab>('view');
@@ -46,10 +47,16 @@ export function VaultView({ vault, onSave, onLock }: VaultViewProps) {
     setActiveTab('view');
   };
 
+  const handleSaveTwoFactorEntries = (twoFactorEntries: TwoFactorEntry[]) => {
+    onSave({ ...vault, twoFactorEntries });
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'add_edit':
         return <AddEditEntryTab onSave={handleSaveEntry} entryToEdit={editingEntry} onCancel={handleCancelEdit} />;
+      case 'twofactor':
+        return <TwoFactorTab twoFactorEntries={vault.twoFactorEntries} onSave={handleSaveTwoFactorEntries} />;
       case 'backup':
         return <BackupTab vault={vault} />;
       case 'view':
@@ -81,6 +88,7 @@ export function VaultView({ vault, onSave, onLock }: VaultViewProps) {
       <nav className="border-b border-input-bg flex space-x-2">
         <TabButton tab="view" label="Entries" />
         <TabButton tab="add_edit" label="Add/Edit Entry" />
+        <TabButton tab="twofactor" label="2FA" />
         <TabButton tab="backup" label="Backup" />
       </nav>
 

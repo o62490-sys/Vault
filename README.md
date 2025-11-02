@@ -8,9 +8,9 @@ A secure, client-side password manager built with React and TypeScript. This app
 - **Strong Encryption**: Utilizes the Web Crypto API with AES-GCM for data encryption and PBKDF2 for key derivation.
 - **Persistent Storage**: Can be run as a standalone desktop app, storing data securely in your OS's application data directory, safe from browser data clearing.
 - **Password Generation**: Includes a robust, cryptographically secure password generator.
-- **Two-Factor Authentication (TOTP)**: Secure your vault with an extra layer of protection using time-based one-time passwords from an authenticator app.
+- **Two-Factor Authentication (TOTP)**: Store and generate TOTP codes for all your accounts. Supports QR code scanning for easy setup.
 - **Password Recovery**: Set up a recovery code or security questions to regain access to your vault if you forget your master password.
-- **Backup & Restore**: Easily export and import your encrypted vault data.
+- **Backup & Restore**: Easily export and import your encrypted vault data, including all 2FA entries.
 - **Cross-Platform**: Run as a desktop app (Windows, macOS, Linux), a mobile app (iOS, Android), or directly in the browser.
 
 ## 🏗️ Build Targets
@@ -159,8 +159,8 @@ This project is configured with [Capacitor](https://capacitorjs.com/) to allow y
 
 ### Prerequisites
 
-- **Android**: You must have [Android Studio](https://developer.android.com/studio) installed and configured on your machine.
-- **iOS**: You must have a macOS machine with [Xcode](https://developer.apple.com/xcode/) installed.
+- **Android**: You must have [Android Studio](https://developer.android.com/studio) installed and configured on your machine (Windows, macOS, or Linux).
+- **iOS**: You must have a **macOS machine** with [Xcode](https://developer.apple.com/xcode/) installed. **iOS development requires macOS** - you cannot build iOS apps on Windows or Linux.
 
 ### Build Steps
 
@@ -206,6 +206,21 @@ This project is configured with [Capacitor](https://capacitorjs.com/) to allow y
   - `types.ts`: Defines all the TypeScript types and interfaces.
 - `src-tauri/`: Contains the configuration and source code for the Tauri desktop app.
 
+## 💾 Data Storage Locations
+
+**Where your encrypted vaults are stored:**
+
+| Platform | Storage Mechanism | Storage Location | Portability |
+|----------|-------------------|------------------|-------------|
+| **Electron Desktop** | SQLite Database | `%APPDATA%/react-vault-manager/vaults.db` (Windows)<br>`~/Library/Application Support/react-vault-manager/vaults.db` (macOS)<br>`~/.config/react-vault-manager/vaults.db` (Linux) | ✅ **Portable** - Data persists across app updates |
+| **Tauri Desktop** | SQLite Database | `%APPDATA%/react-vault-manager/vaults.db` (Windows)<br>`~/Library/Application Support/react-vault-manager/vaults.db` (macOS)<br>`~/.config/react-vault-manager/vaults.db` (Linux) | ✅ **Portable** - Data persists across app updates |
+| **Web Browser** | Browser's localStorage | Browser's localStorage | ❌ **Not portable** - Cleared when browser data is cleared |
+| **Mobile Apps** | Capacitor Storage API | Device's secure storage | ✅ **Portable** - Backed up with device |
+
+**Note on Web Browser Security:** While encrypted, data stored in the browser's `localStorage` is still susceptible to Cross-Site Scripting (XSS) attacks. For maximum security, desktop or mobile versions are recommended.
+
+**Note:** Both Electron and Tauri portable versions now save your encrypted vault data in a SQLite database within your system's application data directory, so your passwords persist even when you update or reinstall the app.
+
 ## 🔐 Security
 
 The security of your data is the top priority.
@@ -214,7 +229,114 @@ The security of your data is the top priority.
 - This vault key is what encrypts all your individual entries.
 - All sensitive information, including the TOTP secret, is encrypted before being stored.
 
-- The master password is never stored. It is used only in memory to derive the encryption key.
-- The derived key is used to encrypt a separate, randomly generated "vault key".
-- This vault key is what encrypts all your individual entries.
-- All sensitive information, including the TOTP secret, is encrypted before being stored.
+## 🔑 Two-Factor Authentication (2FA) Features
+
+React Vault Manager includes comprehensive TOTP (Time-based One-Time Password) support, allowing you to store and generate 2FA codes for all your accounts in one secure location.
+
+### ✨ 2FA Features
+
+- **📱 QR Code Scanning**: Point your camera at 2FA setup QR codes for instant setup
+- **🔄 Real-time Code Generation**: Automatically generates and refreshes TOTP codes
+- **🔒 Secure Storage**: All TOTP secrets are encrypted with your vault key
+- **📋 Manual Entry**: Enter secrets manually if QR scanning isn't available
+- **⚙️ Advanced Settings**: Support for custom algorithms, digit lengths, and time periods
+- **📤 QR Code Export**: Generate QR codes to set up 2FA on other devices
+- **🔄 Backup & Restore**: 2FA entries are included in vault backups
+
+### 🚀 How to Use 2FA
+
+#### Adding a 2FA Entry
+
+1. **Open your vault** and navigate to the **"2FA" tab**
+2. **Click "Add 2FA Entry"**
+3. **Enter account details:**
+   - **Title**: Account name (e.g., "Google Account")
+   - **Issuer**: Service name (e.g., "Google")
+   - **Secret Key**: The TOTP secret (usually base32 encoded)
+
+#### 📱 Scanning QR Codes (Recommended)
+
+For the easiest setup:
+1. When setting up 2FA on a website/app, they'll show a QR code
+2. In Vault Manager, click the **"📱 Scan QR"** button next to the secret field
+3. **Point your camera** at the QR code on your phone/other device
+4. The form will **auto-fill** with all the correct information!
+
+#### Manual Entry
+
+If QR scanning isn't available:
+1. Copy the secret key from your 2FA setup
+2. Paste it into the **Secret Key** field
+3. Fill in Title and Issuer manually
+4. Click **"Show Advanced Settings"** if you need to adjust algorithm/digits/period
+
+#### Using Generated Codes
+
+- **Real-time Updates**: Codes automatically refresh every 30 seconds (or custom period)
+- **Copy to Clipboard**: Click the code to copy it
+- **Visual Countdown**: See when the current code expires
+
+#### Managing 2FA Entries
+
+- **Edit**: Click the "Edit" button to modify account details
+- **Delete**: Click "Delete" to remove an entry (with confirmation)
+- **Show QR**: Generate a QR code to set up the same account on another device/app
+
+### 🔧 Advanced 2FA Settings
+
+Most services use standard settings, but some require customization:
+
+| Setting | Default | Description | Common Alternatives |
+|---------|---------|-------------|-------------------|
+| **Algorithm** | SHA1 | Hash algorithm for code generation | SHA256, SHA512 |
+| **Digits** | 6 | Length of generated codes | 8 digits |
+| **Period** | 30 seconds | How often codes refresh | 60 seconds |
+
+**Note**: Advanced settings are hidden by default. Click "Show Advanced Settings" to access them.
+
+### 🛡️ 2FA Security
+
+- **Encrypted Storage**: TOTP secrets are encrypted with the same AES-GCM encryption as your passwords
+- **Client-Side Only**: No 2FA data ever leaves your device
+- **Secure Generation**: Uses cryptographically secure TOTP generation
+- **Backup Protection**: 2FA entries are included in encrypted backups
+
+### 📱 Supported 2FA Standards
+
+- **TOTP (RFC 6238)**: Time-based one-time passwords
+- **Base32 Encoding**: Standard encoding for secrets
+- **Multiple Algorithms**: SHA1, SHA256, SHA512
+- **Variable Digits**: 6 or 8 digit codes
+- **Custom Periods**: 30-second default, supports others
+
+### 🔄 Backup & Migration
+
+**2FA entries are automatically included** in vault backups and restores. When you:
+- Export a backup → All 2FA entries are encrypted and saved
+- Import a backup → All 2FA entries are restored with their secrets intact
+
+This makes it easy to migrate your 2FA setup between devices or recover from data loss.
+
+### 🎯 Best Practices
+
+1. **Use QR Scanning**: Always scan QR codes when available - it's faster and less error-prone
+2. **Backup Regularly**: Include 2FA entries in your backup routine
+3. **Test Codes**: Always verify generated codes work before deleting from other apps
+4. **Secure Recovery**: Keep backup files in secure locations
+5. **Multiple Devices**: Use "Show QR" to set up the same account on multiple devices
+
+### 🐛 Troubleshooting
+
+**QR Code Won't Scan:**
+- Ensure camera permissions are granted
+- Make sure the QR code is well-lit and in focus
+- Try manual entry if scanning fails
+
+**Codes Don't Work:**
+- Check that the secret key was entered correctly
+- Verify algorithm/digits/period match the service requirements
+- Confirm your device time is accurate (TOTP depends on time sync)
+
+**Import Issues:**
+- Ensure you're importing a valid vault backup file (.vaultbak)
+- Check that the backup was created with a compatible version

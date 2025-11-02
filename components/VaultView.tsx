@@ -16,32 +16,45 @@ type Tab = 'view' | 'add_edit' | 'backup';
 export function VaultView({ vault, onSave, onLock }: VaultViewProps) {
   const [activeTab, setActiveTab] = useState<Tab>('view');
   const [editingEntry, setEditingEntry] = useState<Entry | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleEdit = (entry: Entry) => {
+    setError(null); // Clear any previous errors
     setEditingEntry(entry);
     setActiveTab('add_edit');
   };
 
-  const handleSaveEntry = (entry: Entry) => {
-    const existingIndex = vault.entries.findIndex(e => e.id === entry.id);
-    let newEntries;
-    if (existingIndex > -1) {
-      newEntries = [...vault.entries];
-      newEntries[existingIndex] = entry;
-    } else {
-      newEntries = [...vault.entries, entry];
+  const handleSaveEntry = async (entry: Entry) => {
+    setError(null); // Clear any previous errors
+    try {
+      const existingIndex = vault.entries.findIndex(e => e.id === entry.id);
+      let newEntries;
+      if (existingIndex > -1) {
+        newEntries = [...vault.entries];
+        newEntries[existingIndex] = entry;
+      } else {
+        newEntries = [...vault.entries, entry];
+      }
+      await onSave({ ...vault, entries: newEntries });
+      setEditingEntry(null);
+      setActiveTab('view');
+    } catch (e) {
+      setError(`Failed to save entry: ${(e as Error).message}`);
     }
-    onSave({ ...vault, entries: newEntries });
-    setEditingEntry(null);
-    setActiveTab('view');
   };
 
-  const handleDeleteEntry = (entryId: string) => {
-    const newEntries = vault.entries.filter(e => e.id !== entryId);
-    onSave({ ...vault, entries: newEntries });
+  const handleDeleteEntry = async (entryId: string) => {
+    setError(null); // Clear any previous errors
+    try {
+      const newEntries = vault.entries.filter(e => e.id !== entryId);
+      await onSave({ ...vault, entries: newEntries });
+    } catch (e) {
+      setError(`Failed to delete entry: ${(e as Error).message}`);
+    }
   };
   
   const handleCancelEdit = () => {
+    setError(null); // Clear any previous errors
     setEditingEntry(null);
     setActiveTab('view');
   };
@@ -58,10 +71,15 @@ export function VaultView({ vault, onSave, onLock }: VaultViewProps) {
     }
   };
   
-  const TabButton = ({ tab, label }: { tab: Tab, label: string }) => (
+  const TabButton = ({ tab, label, panelId }: { tab: Tab, label: string, panelId: string }) => (
       <button 
+        id={`tab-${tab}`}
+        role="tab"
+        aria-controls={panelId}
+        aria-selected={activeTab === tab}
         onClick={() => {
             if (tab === 'add_edit') setEditingEntry(null); // Reset when clicking tab directly
+            setError(null); // Clear any previous errors
             setActiveTab(tab);
         }}
         className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors duration-200 focus:outline-none ${activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-text-muted hover:text-text-primary'}`}>
@@ -78,14 +96,21 @@ export function VaultView({ vault, onSave, onLock }: VaultViewProps) {
         </button>
       </header>
       
-      <nav className="border-b border-input-bg flex space-x-2">
-        <TabButton tab="view" label="Entries" />
-        <TabButton tab="add_edit" label="Add/Edit Entry" />
-        <TabButton tab="backup" label="Backup" />
+      <nav className="border-b border-input-bg flex space-x-2" role="tablist">
+        <TabButton tab="view" label="Entries" panelId="panel-view" />
+        <TabButton tab="add_edit" label="Add/Edit Entry" panelId="panel-add_edit" />
+        <TabButton tab="backup" label="Backup" panelId="panel-backup" />
       </nav>
 
       <main className="mt-6">
-        {renderTabContent()}
+        {error && <div className="text-red-500 bg-red-100 border border-red-400 rounded p-3 mb-4" role="alert">{error}</div>}
+        <div
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+        >
+          {renderTabContent()}
+        </div>
       </main>
     </div>
   );
