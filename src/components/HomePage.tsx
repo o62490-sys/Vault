@@ -37,7 +37,7 @@ export function HomePage({ onCreateNew, onSelectVault }: HomePageProps) {
             return;
         }
 
-        // FIX: Restore password recovery fields from backup to prevent data loss.
+        // FIX: Restore password recovery fields and 2FA entries from backup to prevent data loss.
         const restoredVault: EncryptedVault = {
             name: vaultName,
             encryptedVaultKey: backupData.master_key,
@@ -48,6 +48,7 @@ export function HomePage({ onCreateNew, onSelectVault }: HomePageProps) {
             totpIv: backupData.totp_iv,
             recoverySalt: backupData.recovery_salt,
             entries: backupData.entries,
+            twoFactorEntries: backupData.two_factor_entries,
             recoveryMethod: backupData.recovery_method,
             recoveryData: backupData.recovery_data,
             recoveryIv: backupData.recovery_iv,
@@ -75,12 +76,12 @@ export function HomePage({ onCreateNew, onSelectVault }: HomePageProps) {
   };
 
   return (
-    <div className="bg-surface rounded-lg shadow-main p-8 max-w-md mx-auto animate-fade-in">
-      <h1 className="text-3xl font-bold text-center text-primary mb-8">Vault Manager</h1>
+    <div className="bg-gray-900 rounded-lg shadow-lg p-8 max-w-md mx-auto animate-fade-in">
+      <h1 className="text-3xl font-bold text-center text-white mb-8">Vault Manager</h1>
       <div className="space-y-6">
         {vaults.length > 0 && (
           <div>
-            <h2 className="text-lg text-text-muted mb-4 text-center">Open an existing vault:</h2>
+            <h2 className="text-lg text-gray-300 mb-4 text-center">Open an existing vault:</h2>
             <div className="space-y-3">
               {vaults.map(name => (
                 <button

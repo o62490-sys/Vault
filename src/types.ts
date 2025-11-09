@@ -4,6 +4,9 @@ export interface Entry {
   url: string;
   username: string;
   password?: string; // Decrypted password
+  notes?: string; // Decrypted notes
+  notesEncrypted?: boolean; // Whether notes are encrypted with separate password
+  notesPassword?: string; // Password for encrypting notes (if notesEncrypted is true)
 }
 
 export interface TwoFactorEntry {
@@ -22,7 +25,7 @@ export interface EncryptedVault {
   encryptedVaultKey: string; // vaultKey encrypted with masterKey
   salt: string;
   iv: string;
-  authMethods: ('master_password' | 'recovery_password' | 'totp')[];
+  authMethods: ('master_password' | 'recovery_password' | 'totp' | 'biometric')[];
   encryptedTotpSecret?: string; // Encrypted with masterKey
   totpIv?: string; // IV for TOTP secret encryption
   recoverySalt?: string;
@@ -57,6 +60,7 @@ export interface BackupData {
     totp_iv?: string;
     recovery_salt?: string;
     entries: string;
+    two_factor_entries?: string;
     created_at: string;
 
     // FIX: Add missing password recovery fields to the backup data interface.

@@ -28,6 +28,8 @@
     "open:ios": "npx cap open ios"
   },
   "dependencies": {
+    "@aparajita/capacitor-biometric-auth": "^9.1.2",
+    "@capacitor/preferences": "^6.0.3",
     "@tauri-apps/plugin-fs": "^2.4.2",
     "@tauri-apps/plugin-sql": "^2.0.0-beta.10",
     "@zxing/library": "^0.21.3",

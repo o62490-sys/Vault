@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import type { UnlockedVault, Entry, TwoFactorEntry } from '../types';
+import { cryptoService } from '../../services/cryptoService';
 import { ViewEntriesTab } from './ViewEntriesTab';
 import { AddEditEntryTab } from './AddEditEntryTab';
 import { BackupTab } from './BackupTab';
@@ -37,9 +38,21 @@ export function VaultView({ vault, onSave, onLock }: VaultViewProps) {
     setActiveTab('view');
   };
 
-  const handleDeleteEntry = (entryId: string) => {
-    const newEntries = vault.entries.filter(e => e.id !== entryId);
-    onSave({ ...vault, entries: newEntries });
+  const handleDeleteEntry = async (entryId: string) => {
+    // Require password confirmation for deletion
+    const passwordConfirm = prompt('Enter your master password to confirm deletion:');
+    if (!passwordConfirm) return;
+
+    try {
+      // Verify password before allowing deletion
+      const salt = cryptoService.b64decode(vault.encryptedVault.salt);
+      await cryptoService.deriveKey(passwordConfirm, new Uint8Array(salt));
+
+      const newEntries = vault.entries.filter(e => e.id !== entryId);
+      onSave({ ...vault, entries: newEntries });
+    } catch (e) {
+      alert('Invalid password. Deletion cancelled.');
+    }
   };
   
   const handleCancelEdit = () => {

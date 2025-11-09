@@ -11,7 +11,7 @@ A secure, client-side password manager built with React and TypeScript. This app
 - **Two-Factor Authentication (TOTP)**: Store and generate TOTP codes for all your accounts. Supports QR code scanning for easy setup.
 - **Password Recovery**: Set up a recovery code or security questions to regain access to your vault if you forget your master password.
 - **Backup & Restore**: Easily export and import your encrypted vault data, including all 2FA entries.
-- **Cross-Platform**: Run as a desktop app (Windows, macOS, Linux), a mobile app (iOS, Android), or directly in the browser.
+- **Cross-Platform**: Run as a desktop app (Windows, macOS, Linux), a mobile app (, Android), or directly in the browser.
 
 ## 🏗️ Build Targets
 
@@ -21,7 +21,7 @@ This application supports multiple deployment targets:
 |--------|-----------|----------|---------------|
 | **Electron** (Recommended) | Windows, macOS, Linux | Native desktop app with best user experience | `npm run electron:build` |
 | **Tauri** | Windows, macOS, Linux | Lightweight desktop app (alternative to Electron) | `npm run tauri:build` |
-| **Capacitor** | iOS, Android | Native mobile applications | `npm run sync:android` / `npm run sync:ios` |
+| **Capacitor** | , Android | Native mobile applications | `npm run sync:android` / `npm run sync:` |
 | **Web** | All platforms | Browser-based version | `npm run build` |
 
 ### 🔧 Recent Fixes Applied
@@ -85,9 +85,9 @@ This project uses [Vite](https://vitejs.dev/) as a build tool. You will need [No
 | `npm run electron:build:linux` | Build Linux Electron app | `dist-electron/release/*.AppImage` |
 | `npm run tauri:build` | Build Tauri desktop app | `src-tauri/target/release/bundle/` |
 | `npm run sync:android` | Prepare Android build | `android/` folder |
-| `npm run sync:ios` | Prepare iOS build | iOS project files |
+| `npm run sync:` | Prepare  build |  project files |
 | `npm run open:android` | Open in Android Studio | Android development |
-| `npm run open:ios` | Open in Xcode | iOS development |
+| `npm run open:` | Open in Xcode |  development |
 
 ## 🖥️ Building for Desktop (Electron - Recommended)
 
@@ -153,14 +153,13 @@ You need to set up your system for Tauri development. Follow the official guide 
     This command will create an installer for your specific operating system (e.g., `.msi` on Windows, `.app` on macOS) inside the `src-tauri/target/release/bundle` directory.
 
 
-## 📱 Building for Mobile (Android & iOS)
+## 📱 Building for Mobile (Android )
 
 This project is configured with [Capacitor](https://capacitorjs.com/) to allow you to build and run it as a native mobile application.
 
 ### Prerequisites
 
 - **Android**: You must have [Android Studio](https://developer.android.com/studio) installed and configured on your machine (Windows, macOS, or Linux).
-- **iOS**: You must have a **macOS machine** with [Xcode](https://developer.apple.com/xcode/) installed. **iOS development requires macOS** - you cannot build iOS apps on Windows or Linux.
 
 ### Build Steps
 
@@ -168,7 +167,7 @@ This project is configured with [Capacitor](https://capacitorjs.com/) to allow y
     Run these commands once to add the native platforms to your project:
     ```bash
     npx cap add android
-    npx cap add ios
+    npx cap add 
     ```
 
 2.  **Sync Your Web App with the Native Project**:
@@ -178,10 +177,6 @@ This project is configured with [Capacitor](https://capacitorjs.com/) to allow y
     ```bash
     npm run sync:android
     ```
-    For iOS:
-    ```bash
-    npm run sync:ios
-    ```
 
 3.  **Open, Build, and Run in the IDE**:
     After syncing, open the native project in its respective IDE:
@@ -190,11 +185,6 @@ This project is configured with [Capacitor](https://capacitorjs.com/) to allow y
     ```bash
     npm run open:android
     ```
-    For iOS:
-    ```bash
-    npm run open:ios
-    ```
-
 ## 📂 Project Structure
 
 - `index.html`: The main entry point of the application.

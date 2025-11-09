@@ -25,6 +25,9 @@ export function BackupTab({ vault }: BackupTabProps) {
             recovery_iv: vault.encryptedVault.recoveryIv,
             encrypted_vault_key_for_recovery: vault.encryptedVault.encryptedVaultKeyForRecovery,
             entries: await cryptoService.encryptEntries(vault.entries, vault.vaultKey),
+            two_factor_entries: vault.twoFactorEntries.length > 0
+                ? await (cryptoService as any).encryptTwoFactorEntries(vault.twoFactorEntries, vault.vaultKey)
+                : undefined,
             created_at: new Date().toISOString()
         };
 

@@ -4,6 +4,19 @@ export interface Entry {
   url: string;
   username: string;
   password?: string; // Decrypted password
+  notes?: string; // Decrypted notes
+  notesEncrypted?: boolean; // Whether notes are encrypted with separate password
+  notesPassword?: string; // Password for encrypting notes (if notesEncrypted is true)
+}
+
+export interface TwoFactorEntry {
+  id: string;
+  title: string;
+  issuer: string;
+  secret: string; // TOTP secret
+  algorithm?: 'SHA1' | 'SHA256' | 'SHA512';
+  digits?: 6 | 8;
+  period?: number;
 }
 
 // Stored in localStorage, passwords are encrypted
@@ -12,16 +25,17 @@ export interface EncryptedVault {
   encryptedVaultKey: string; // vaultKey encrypted with masterKey
   salt: string;
   iv: string;
-  authMethods: ('master_password' | 'recovery_password' | 'totp')[];
+  authMethods: ('master_password' | 'recovery_password' | 'totp' | 'biometric')[];
   encryptedTotpSecret?: string; // Encrypted with masterKey
   totpIv?: string; // IV for TOTP secret encryption
   recoverySalt?: string;
   entries: string; // JSON string of Entry[] with passwords encrypted by vaultKey, then base64
+  twoFactorEntries?: string; // JSON string of TwoFactorEntry[] with secrets encrypted by vaultKey, then base64
 
   // New fields for password recovery
   recoveryMethod?: 'code' | 'questions';
   // Hashed recovery code OR JSON string of {q: string, a: string (hashed)}[]
-  recoveryData?: string; 
+  recoveryData?: string;
   recoveryIv?: string; // IV for encrypting vault key with recovery key
   encryptedVaultKeyForRecovery?: string; // vaultKey encrypted with recoveryKey
 }
@@ -32,7 +46,8 @@ export interface UnlockedVault {
   vaultKey: CryptoKey;
   masterKey: CryptoKey;
   entries: Entry[];
-  encryptedVault: Omit<EncryptedVault, 'entries'>;
+  twoFactorEntries: TwoFactorEntry[];
+  encryptedVault: Omit<EncryptedVault, 'entries' | 'twoFactorEntries'>;
 }
 
 export interface BackupData {
@@ -45,6 +60,7 @@ export interface BackupData {
     totp_iv?: string;
     recovery_salt?: string;
     entries: string;
+    two_factor_entries?: string;
     created_at: string;
 
     recovery_method?: 'code' | 'questions';
