@@ -7,22 +7,20 @@ export default {
   theme: {
     extend: {
       colors: {
-        // OLED Dark Theme Colors
-        'theme-bg': '#000000',        // Pure black background
-        'theme-surface': '#1a1a1a',   // Very dark gray surfaces
-        'theme-primary': '#ffffff',   // White for primary buttons
-        'theme-secondary': '#2a2a2a', // Dark gray for secondary
-        'theme-success': '#4ade80',   // Light green
-        'theme-error': '#ef4444',     // Light red
-        'theme-text': '#ffffff',      // White text
-        'theme-text-muted': '#9ca3af', // Light gray text
-        'theme-accent': '#60a5fa',    // Light blue accents
-        'theme-input': '#2a2a2a',     // Dark input backgrounds
-        'theme-border': '#404040',    // Border color
+        'bg': '#000000',
+        'surface': '#0f0f0f',
+        'primary': '#2b380e',
+        'primary-dark': '#3d5014',
+        'success': '#1f8b4d',
+        'error': '#bb2717',
+        'text-primary': '#ecf0f1',
+        'text-muted': '#bdc3c7',
+        'accent': '#005764',
+        'input-bg': '#3c3c3c',
       },
       boxShadow: {
-        'main': '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)',
-        'modal': '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+        'main': '0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.15)',
+        'modal': '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
       }
     }
   },
