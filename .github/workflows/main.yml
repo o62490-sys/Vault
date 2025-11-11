@@ -1,0 +1,60 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build mobile app
+        run: npm run build:mobile
+
+      - name: Sync to iOS
+        run: npm run sync:ios
+
+      - name: Setup Xcode
+        run: |
+          sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+          sudo xcodebuild -runFirstLaunch
+
+      - name: Build iOS app
+        run: |
+          cd ios/App
+          xcodebuild build-for-testing \
+            -scheme App \
+            -configuration Release \
+            -derivedDataPath build \
+            -UseModernBuildSystem=YES
+
+      - name: Create IPA
+        run: |
+          cd ios/App
+          xcodebuild -archivePath build/App.xcarchive \
+            -scheme App \
+            -configuration Release \
+            archive
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportOptionsPlist ExportOptions.plist \
+            -exportPath build/ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: ios/App/build/ipa/*.ipa
