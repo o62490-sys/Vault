@@ -21,9 +21,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Add iOS platform
-        run: npx cap add ios
-
       - name: Build mobile app
         run: npm run build:mobile
 
