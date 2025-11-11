@@ -8,28 +8,26 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Install electron-builder
+      - name: Install electron-builder globally
         run: npm install -g electron-builder
 
-      - name: Remove app-builder-bin
-        run: rm -rf node_modules/app-builder-bin
-
-      - name: Install app-builder-bin
-        run: npm install
-
-      - name: Build DMG
-        run: electron-builder -mwl
+      - name: Build macOS DMG
+        run: electron-builder -m
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
-          name: myapp.dmg
-          path: dist-electron/release/Vault.dmg
+          name: macos-dmg
+          path: dist-electron/release/*.dmg
