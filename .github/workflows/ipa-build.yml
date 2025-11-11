@@ -27,6 +27,12 @@ jobs:
       - name: Sync to iOS
         run: npm run sync:ios
 
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios/App
+          pod install
+          cd ../..
+
       - name: Setup Xcode
         run: |
           sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
