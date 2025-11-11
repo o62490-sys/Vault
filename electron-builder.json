@@ -5,11 +5,11 @@
     "output": "dist-electron/release",
     "buildResources": "src"
   },
-  "icon": "password_manager_icons/128x128@2x.png",
+  "icon": "assets/logo-1024x1024.png",
   "files": [
     "build/electron/**/*",
-    "dist-electron/main.cjs",
-    "dist-electron/preload.cjs"
+    "main.cjs",
+    "preload.cjs"
   ],
   "extraResources": [
     {
@@ -50,8 +50,7 @@
         "arch": ["x64"]
       }
     ],
-    "publisherName": "React Vault Manager",
-    "icon": "password_manager_icons/128x128@2x.png"
+    "icon": "assets/logo-1024x1024.png"
   },
   "portable": {
     "artifactName": "React-Vault-Manager-Portable.exe"
