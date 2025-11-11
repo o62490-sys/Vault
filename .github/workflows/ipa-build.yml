@@ -35,31 +35,24 @@ jobs:
           sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
           sudo xcodebuild -runFirstLaunch
 
-      - name: Build iOS app
-        run: |
-          cd ios/App
-          xcodebuild build-for-testing \
-            -scheme App \
-            -configuration Release \
-            -derivedDataPath build \
-            -UseModernBuildSystem=YES
-
-      - name: Create IPA
+      - name: Build iOS archive
         run: |
           cd ios/App
           xcodebuild -archivePath build/App.xcarchive \
             -scheme App \
             -configuration Release \
             archive
+
+      - name: Export IPA
+        run: |
+          cd ios/App
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
             -exportPath build/ipa
 
-      - name: Upload IPA artifact
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa
-          path: ios/App/build/ipa/*.ipa
           name: ios-ipa
           path: ios/App/build/ipa/*.ipa
