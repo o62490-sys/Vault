@@ -19,6 +19,12 @@ jobs:
       - name: Install electron-builder
         run: npm install -g electron-builder
 
+      - name: Remove app-builder-bin
+        run: rm -rf node_modules/app-builder-bin
+
+      - name: Install app-builder-bin
+        run: npm install
+
       - name: Build DMG
         run: electron-builder -mwl
 
