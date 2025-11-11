@@ -51,16 +51,15 @@ jobs:
             CODE_SIGN_ENTITLEMENTS="" \
             archive
 
-      - name: Export IPA
+      - name: Extract IPA from Archive
         run: |
           cd ios/App
-          xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportOptionsPlist ExportOptions.plist \
-            -exportPath build/ipa
+          mkdir -p build/ipa
+          cd build/App.xcarchive/Products/Applications
+          zip -r ../../../ipa/App.ipa App.app
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa
-          path: ios/App/build/ipa/*.ipa
+          path: ios/App/build/ipa/App.ipa
