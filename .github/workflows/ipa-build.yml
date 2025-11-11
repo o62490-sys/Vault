@@ -41,9 +41,10 @@ jobs:
       - name: Build iOS archive
         run: |
           cd ios/App
-          xcodebuild -archivePath build/App.xcarchive \
+          xcodebuild -workspace App.xcworkspace \
             -scheme App \
             -configuration Release \
+            -archivePath build/App.xcarchive \
             -allowProvisioningUpdates \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
