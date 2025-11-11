@@ -234,7 +234,7 @@ export function CreateVaultPage({ onBack, onCreated }: CreateVaultPageProps) {
         {error && <p className="text-error text-sm mt-6 text-center">{error}</p>}
 
         <div className="mt-8 space-y-3">
-          <button onClick={handleCreate} disabled={isLoading} className="btn btn-primary disabled:opacity-50">
+          <button onClick={handleCreate} disabled={isLoading} className="btn btn-main disabled:opacity-50">
             {isLoading ? 'Creating...' : 'Create Vault'}
           </button>
           <button onClick={onBack} className="btn btn-secondary">

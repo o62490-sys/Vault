@@ -105,7 +105,7 @@ export function PasswordGenerator({ onGenerate }: PasswordGeneratorProps) {
       </div>
       
       <div className="mt-8 space-y-3">
-        <button onClick={generatePassword} className="btn btn-accent">
+        <button onClick={generatePassword} className="btn btn-generate">
           ✨ Generate & Insert
         </button>
         <button onClick={handleCopyToClipboard} className="btn btn-secondary flex items-center justify-center disabled:opacity-50" disabled={!generatedPassword}>

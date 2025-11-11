@@ -234,7 +234,7 @@ export function TwoFactorTab({ twoFactorEntries, onSave }: TwoFactorTabProps) {
         <h2 className="text-xl font-semibold text-primary">Two-Factor Authentication</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="btn btn-primary"
+          className="btn btn-tfa !w-auto text-sm px-4 py-2"
         >
           {showAddForm ? 'Cancel' : 'Add 2FA Entry'}
         </button>
@@ -287,7 +287,7 @@ export function TwoFactorTab({ twoFactorEntries, onSave }: TwoFactorTabProps) {
                 type="button"
                 onClick={startScanning}
                 disabled={isScanning}
-                className="btn btn-secondary !w-auto px-4 py-2 whitespace-nowrap disabled:opacity-50"
+                className="btn btn-tfa-secondary !w-auto px-4 py-2 whitespace-nowrap disabled:opacity-50"
                 title="Scan QR code from your phone"
               >
                 📱 {isScanning ? 'Scanning...' : 'Scan QR'}
@@ -351,10 +351,10 @@ export function TwoFactorTab({ twoFactorEntries, onSave }: TwoFactorTabProps) {
           )}
 
           <div className="flex space-x-3">
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-tfa-add">
               {editingEntry ? 'Update' : 'Add'} Entry
             </button>
-            <button type="button" onClick={resetForm} className="btn btn-secondary">
+            <button type="button" onClick={resetForm} className="btn btn-danger">
               Cancel
             </button>
           </div>

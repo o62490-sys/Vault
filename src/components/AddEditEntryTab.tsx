@@ -142,7 +142,7 @@ export function AddEditEntryTab({ onSave, entryToEdit, onCancel }: AddEditEntryT
           </div>
         </div>
         <div className="mt-8 flex space-x-3">
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-entry">
                 {isEditing ? 'Save Changes' : 'Add Entry'}
             </button>
             {isEditing && (

@@ -57,13 +57,13 @@ export function BackupTab({ vault }: BackupTabProps) {
         Export your vault to a secure backup file. Store this file in a safe place. You can restore your vault from this file on any device.
       </p>
       
-      <div className="max-w-md mx-auto mb-8 text-sm text-accent bg-input-bg p-3 rounded-md">
+      <div className="security-note">
         <strong>Security Note:</strong> The backup file contains your encrypted data. It is useless without your original Master Password.
       </div>
 
       <button 
         onClick={handleExport}
-        className="btn btn-primary max-w-xs mx-auto"
+        className="btn btn-export max-w-xs mx-auto"
       >
         Export Vault Backup
       </button>

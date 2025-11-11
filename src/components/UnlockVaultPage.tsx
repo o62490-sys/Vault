@@ -349,7 +349,7 @@ export function UnlockVaultPage({ vaultName, onUnlock, onBack, onVaultDeleted }:
           {error && <p className="text-error text-sm text-center">{error}</p>}
 
           <div className="pt-2 space-y-3">
-            <button type="submit" disabled={isLoading} className="btn btn-primary disabled:opacity-50">
+            <button type="submit" disabled={isLoading} className="btn btn-main disabled:opacity-50">
               {isLoading ? 'Unlocking...' : 'Unlock'}
             </button>
             {biometricsAvailable && vaultData.authMethods.includes('biometric') && (

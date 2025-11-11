@@ -97,7 +97,7 @@ export function HomePage({ onCreateNew, onSelectVault }: HomePageProps) {
         <div className="pt-4 space-y-3">
           <button
             onClick={onCreateNew}
-            className="btn btn-primary"
+            className="btn btn-main"
           >
             Create New Vault
           </button>
