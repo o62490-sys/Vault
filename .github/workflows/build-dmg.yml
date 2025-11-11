@@ -16,6 +16,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install electron-builder
+        run: npm install -g electron-builder
+
       - name: Build DMG
         run: electron-builder -mwl
 
@@ -23,4 +26,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: myapp.dmg
-          path: dist-electron/release/myapp.dmg
+          path: dist-electron/release/Vault.dmg
