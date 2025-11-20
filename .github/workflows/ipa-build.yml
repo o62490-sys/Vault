@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Build mobile app
-        run: npm run build:mobile
+        run: npm run build:mobile && npx cap sync ios
 
       - name: Sync to iOS
         run: npm run sync:ios
