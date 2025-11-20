@@ -1,0 +1,27 @@
+name: Electron Windows Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run electron:build:win
+
+      # Upload portable installer (.exe)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: electron-build-portable
+          path: dist-electron/release/*.exe
+
+      # Upload unpacked folder
+      - uses: actions/upload-artifact@v4
+        with:
+          name: electron-build-unpacked
+          path: dist-electron/release/win-unpacked/**
